@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import sys
+import tty
 import signal
 import select
 import termios
-import tty
+import argparse
 import paramiko
 from scp import SCPClient
 from pymobiledevice3.usbmux import select_devices_by_connection_type, create_mux
 
+def get_device():
+    devices = select_devices_by_connection_type(connection_type='USB')
+    if not devices:
+        print("[✗] No iOS device found")
+        sys.exit(1)
+    device = devices[0]
+    print(f"[✓] Found device: {device.serial}")
+    return device
+
 def transfer_file(device, local_path, remote_path):
-    """파일을 iOS 기기로 전송"""
     if not os.path.exists(local_path):
         print(f"[✗] File not found: {local_path}")
         return False
@@ -36,7 +45,6 @@ def transfer_file(device, local_path, remote_path):
         transport.close()
 
 def interactive_shell(device):
-    """인터랙티브 SSH 쉘"""
     mux = create_mux()
     sock = mux.connect(device, 44)
     
@@ -78,16 +86,22 @@ def main():
     signal.signal(signal.SIGINT, lambda s, f: sys.exit(0))
     signal.signal(signal.SIGTERM, lambda s, f: sys.exit(0))
     
-    devices = select_devices_by_connection_type(connection_type='USB')
-    if not devices:
-        print("No iOS device found")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='iOS SSH Tool')
+    parser.add_argument('-t', '--transfer', nargs=2, metavar=('LOCAL', 'REMOTE'),
+                        help='Transfer file: -t <local_path> <remote_path>')
+    parser.add_argument('-s', '--shell', action='store_true',
+                        help='Start interactive shell')
     
-    device = devices[0]
-    print(f"Found device: {device.serial}")
+    args = parser.parse_args()
     
-    print("\n[*] Starting interactive shell...\n")
-    interactive_shell(device)
+    device = get_device()
+    
+    if args.transfer:
+        local_path, remote_path = args.transfer
+        transfer_file(device, local_path, remote_path)
+    else:
+        print("\n[*] Starting interactive shell...\n")
+        interactive_shell(device)
 
 if __name__ == "__main__":
     main()

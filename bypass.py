@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
 import os
-import signal
+import sys
 import time
+import signal
 import paramiko
 from scp import SCPClient
 from pymobiledevice3.usbmux import select_devices_by_connection_type, create_mux
 
 def get_device():
-    """iOS 기기 찾기"""
     devices = select_devices_by_connection_type(connection_type='USB')
     if not devices:
         print("[✗] No iOS device found")
@@ -20,7 +19,6 @@ def get_device():
     return device
 
 def transfer_file(device, local_path, remote_path):
-    """파일을 iOS 기기로 전송"""
     if not os.path.exists(local_path):
         print(f"[✗] File not found: {local_path}")
         return False
@@ -45,11 +43,9 @@ def transfer_file(device, local_path, remote_path):
         transport.close()
 
 def execute_command(transport, command, wait_time=1):
-    """SSH 명령 실행"""
     channel = transport.open_session()
     channel.exec_command(command)
     
-    # 출력 대기
     time.sleep(wait_time)
     
     output = ""
@@ -66,7 +62,6 @@ def execute_command(transport, command, wait_time=1):
     return exit_status, output, error
 
 def run_bypass(device):
-    """바이패스 명령 실행"""
     print("\n[*] Starting activation bypass...")
     print("=" * 50)
     
@@ -122,17 +117,14 @@ def main():
     print("iOS Activation Bypass Tool")
     print("=" * 50)
     
-    # 기기 찾기
     device = get_device()
     
-    # 파일 전송
     local_file = os.path.join(os.getcwd(), "mobileactivationd")
     remote_file = "/var/root/mobileactivationd"
     
     if not transfer_file(device, local_file, remote_file):
         sys.exit(1)
     
-    # 바이패스 실행
     run_bypass(device)
 
 if __name__ == "__main__":
