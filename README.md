@@ -2,6 +2,8 @@
 
 A Python-based iCloud activation bypass tool for iOS 12.x devices using checkra1n jailbreak.
 
+![bypass](https://github.com/hackintoanetwork/ios-icloud-activation-bypass/blob/main/img/bypass.png)
+
 ## Supported Devices & iOS Versions
 
 - **Devices**: iPhone 5s, iPhone 6, iPhone 6 Plus, iPad Mini 2/3, iPad Air 1, iPod Touch 6 (A7 devices)
@@ -52,12 +54,14 @@ After the script finishes, tap **"Connect to iTunes"** on your device.
 ### ios_ssh.py
 
 Interactive SSH shell and file transfer utility.
+
+![ios_ssh](https://github.com/hackintoanetwork/ios-icloud-activation-bypass/blob/main/img/ios_ssh.png)
 ```bash
 # Interactive shell
 python3 ios_ssh.py
 
 # Transfer file to device
-python3 ios_ssh.py -t  
+python3 ios_ssh.py -t <local_file> <remote_path>
 ```
 
 #### File Transfer Examples
